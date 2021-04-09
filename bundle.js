@@ -4534,16 +4534,16 @@ let GiveMeARandomChartPlease = class GiveMeARandomChartPlease extends LitElement
         this.loading = false;
         this.fetchSymbols();
         window.app = this;
+        window.addEventListener('gamepadconnected', e => {
+            this.gamePadLoop();
+        });
     }
     render() {
         return html `
     <div style="margin:12px;text-align:center">
-      <mwc-button unelevated icon="casino"
-        @click="${() => {
-            clickSound();
-            this.updateChart();
-        }}"
-        ?disabled="${this.pairs.length === 0}">random</mwc-button>
+      <mwc-button unelevated icon="casino" style="--mdc-button-disabled-fill-color:grey;--mdc-button-disabled-ink-color:black"
+        @click="${() => this.updateChart()}"
+        ?disabled="${this.loading || this.pairs.length === 0}">random</mwc-button>
     </div>
     <div id="cryptowatch-wrapper">
       <div id="pair">${this.choosen?.b}${this.choosen?.q}</div>
@@ -4551,6 +4551,17 @@ let GiveMeARandomChartPlease = class GiveMeARandomChartPlease extends LitElement
       <div id="cryptowatch-container"></div>
     </div>
     `;
+    }
+    gamePadLoop() {
+        const gp = navigator.getGamepads()[0];
+        if (!gp) {
+            return;
+        }
+        if (buttonPressed(gp.buttons[2])) {
+            // this.shadowRoot!.querySelector('mwc-button')!.click()
+            this.updateChart();
+        }
+        requestAnimationFrame(() => this.gamePadLoop());
     }
     async fetchSymbols() {
         const data = await (await fetch('https://www.binance.com/api/v3/exchangeInfo')).json();
@@ -4564,6 +4575,7 @@ let GiveMeARandomChartPlease = class GiveMeARandomChartPlease extends LitElement
         if (this.loading) {
             return;
         }
+        clickSound();
         this.loading = true;
         this.cryptowatchContainer.firstElementChild?.remove();
         const pair = this.getRandomPair();
@@ -4583,7 +4595,7 @@ let GiveMeARandomChartPlease = class GiveMeARandomChartPlease extends LitElement
         chart.mount(this.cryptowatchContainer);
         setTimeout(() => {
             this.loading = false;
-        }, 5000);
+        }, 6000);
     }
 };
 GiveMeARandomChartPlease.styles = css `
@@ -4634,6 +4646,12 @@ GiveMeARandomChartPlease = __decorate([
 window.clicker = new Audio('./sounds/click.mp3');
 function clickSound() {
     window.clicker.play();
+}
+function buttonPressed(b) {
+    if (typeof (b) == "object") {
+        return b.pressed;
+    }
+    return b == 1.0;
 }
 
 export { GiveMeARandomChartPlease };
