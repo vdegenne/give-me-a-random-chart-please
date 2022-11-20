@@ -136,11 +136,15 @@ export class GiveMeARandomChartPlease extends LitElement {
     this.requestUpdate()
   }
 
+  private visiting = false
   public visitCoinMarketCap () {
+    if (this.visiting) { return }
+    this.visiting = true
     const url = getcoinurl(this.currentPair.b)
     if (url) {
       window.open(url, `_blank`)
     }
+    setTimeout(() => this.visiting = false, 1000)
   }
 
   public loadANewChart () {

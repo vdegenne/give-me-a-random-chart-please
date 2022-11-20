@@ -6,5 +6,7 @@ import json from '@rollup/plugin-json';
 export default {
   input: './src/give-me-a-random-chart-please.ts',
   output: { file: './bundle.js', format: 'esm' },
-  plugins: [typescript(), nodeResolve(), terser(), json()]
+  plugins: [typescript(), nodeResolve(), terser({
+    format: { comments: false }
+  }), json()]
 }
