@@ -2,6 +2,7 @@ import { css, customElement, html, LitElement, property, query } from 'lit-eleme
 import '@material/mwc-button'
 import '@material/mwc-circular-progress'
 import { getcoinurl } from './coinmarketcap.js';
+import { ControllerController } from './ControllerController.js';
 
 declare global {
   interface Window {
@@ -43,9 +44,9 @@ export class GiveMeARandomChartPlease extends LitElement {
     this.fetchSymbols()
     window.app = this;
 
-    window.addEventListener('gamepadconnected', e => {
-      this.gamePadLoop()
-    })
+    // window.addEventListener('gamepadconnected', e => {
+    //   this.gamePadLoop()
+    // })
 
     window.addEventListener('keydown', e => {
       if (e.code == 'KeyR' && !e.ctrlKey) {
@@ -56,6 +57,8 @@ export class GiveMeARandomChartPlease extends LitElement {
         this.visitCoinMarketCap()
       }
     })
+
+    new ControllerController(this)
   }
 
   static styles = css`
@@ -113,19 +116,19 @@ export class GiveMeARandomChartPlease extends LitElement {
     `
   }
 
-  private gamePadLoop() {
-    const gp = navigator.getGamepads()[0]
-    if (!gp) { return }
+  // private gamePadLoop() {
+  //   const gp = navigator.getGamepads()[0]
+  //   if (!gp) { return }
 
-    if (buttonPressed(gp.buttons[3])) {
-      // this.shadowRoot!.querySelector('mwc-button')!.click()
-      this.loadANewChart()
-    }
-    if (buttonPressed(gp.buttons[2])) {
-      this.visitCoinMarketCap()
-    }
-    requestAnimationFrame(() => this.gamePadLoop())
-  }
+  //   if (buttonPressed(gp.buttons[3])) {
+  //     // this.shadowRoot!.querySelector('mwc-button')!.click()
+  //     this.loadANewChart()
+  //   }
+  //   if (buttonPressed(gp.buttons[2])) {
+  //     this.visitCoinMarketCap()
+  //   }
+  //   requestAnimationFrame(() => this.gamePadLoop())
+  // }
 
   private async fetchSymbols() {
     const data = await (await fetch('https://www.binance.com/api/v3/exchangeInfo')).json()
@@ -136,15 +139,12 @@ export class GiveMeARandomChartPlease extends LitElement {
     this.requestUpdate()
   }
 
-  private visiting = false
   public visitCoinMarketCap () {
-    if (this.visiting) { return }
-    this.visiting = true
+    if (!this.currentPair) { return }
     const url = getcoinurl(this.currentPair.b)
     if (url) {
       window.open(url, `_blank`)
     }
-    setTimeout(() => this.visiting = false, 1000)
   }
 
   public loadANewChart () {
@@ -166,14 +166,19 @@ export class GiveMeARandomChartPlease extends LitElement {
   }
 
   private updateCryptowatch (pair: PairInfo) {
-    const chart = new cryptowatch.Embed('binance', `${pair.b}${pair.q}`, {
-      timePeriod: '1d',
-      presetColorScheme: 'ishihara'
-    })
-    chart.mount(this.cryptowatchContainer)
-    setTimeout(() => {
-      this.loading = false
-    }, 6000)
+    try {
+      const chart = new cryptowatch.Embed('binance', `${pair.b}${pair.q}`, {
+        timePeriod: '1d',
+        presetColorScheme: 'ishihara'
+      })
+      chart.mount(this.cryptowatchContainer)
+    }
+    catch (e) {}
+    finally {
+      setTimeout(() => {
+        this.loading = false
+      }, 5000)
+    }
   }
 }
 
