@@ -1,6 +1,7 @@
 import { css, customElement, html, LitElement, property, query } from 'lit-element';
 import '@material/mwc-button'
 import '@material/mwc-circular-progress'
+import { getcoinurl } from './coinmarketcap.js';
 
 declare global {
   interface Window {
@@ -27,6 +28,8 @@ export class GiveMeARandomChartPlease extends LitElement {
 
   private pairs: PairInfo[] = []
 
+  private currentPair!: PairInfo;
+
   @property({type:Boolean})
   private loading = false;
 
@@ -42,6 +45,16 @@ export class GiveMeARandomChartPlease extends LitElement {
 
     window.addEventListener('gamepadconnected', e => {
       this.gamePadLoop()
+    })
+
+    window.addEventListener('keydown', e => {
+      if (e.code == 'KeyR' && !e.ctrlKey) {
+        this.loadANewChart()
+      }
+
+      if (e.ctrlKey == false && e.code == 'KeyE') {
+        this.visitCoinMarketCap()
+      }
     })
   }
 
@@ -81,15 +94,21 @@ export class GiveMeARandomChartPlease extends LitElement {
 
   render () {
     return html`
-    <div style="margin:12px;text-align:center">
-      <!-- <mwc-button unelevated icon="casino" style="--mdc-button-disabled-fill-color:grey;--mdc-button-disabled-ink-color:black"
-        @click="${() => this.updateChart()}"
-        ?disabled="${this.loading || this.pairs.length === 0}">random</mwc-button> -->
-    </div>
+    <!-- <div style="margin:12px;text-align:center">
+      <mwc-button unelevated icon="casino" style="--mdc-button-disabled-fill-color:grey;--mdc-button-disabled-ink-color:black"
+        @click="${() => this.loadANewChart()}"
+        ?disabled="${this.loading || this.pairs.length === 0}">random</mwc-button>
+    </div> -->
     <div id="cryptowatch-wrapper">
       <div id="pair">${this.choosen?.b}${this.choosen?.q}</div>
       <mwc-circular-progress ?indeterminate="${this.loading}"></mwc-circular-progress>
-      <div id="cryptowatch-container"></div>
+      <div id="cryptowatch-container" style="display:flex;justify-content:center;align-items:center">
+        <div id=instructions style="color:white">
+          <p>Press <b style="background:white;color:black;padding:0 4px">R</b> to load a new random graph</p>
+          <p>Press <b style="background:white;color:black;padding:0 4px">E</b> to visit the coin (coinmarketcap) page</p>
+          <p>(bonus: you can use a controller)</p>
+        </div>
+      </div>
     </div>
     `
   }
@@ -98,9 +117,12 @@ export class GiveMeARandomChartPlease extends LitElement {
     const gp = navigator.getGamepads()[0]
     if (!gp) { return }
 
-    if (buttonPressed(gp.buttons[2])) {
+    if (buttonPressed(gp.buttons[3])) {
       // this.shadowRoot!.querySelector('mwc-button')!.click()
-      this.updateChart()
+      this.loadANewChart()
+    }
+    if (buttonPressed(gp.buttons[2])) {
+      this.visitCoinMarketCap()
     }
     requestAnimationFrame(() => this.gamePadLoop())
   }
@@ -114,13 +136,22 @@ export class GiveMeARandomChartPlease extends LitElement {
     this.requestUpdate()
   }
 
-  private updateChart () {
+  public visitCoinMarketCap () {
+    const url = getcoinurl(this.currentPair.b)
+    if (url) {
+      window.open(url, `_blank`)
+    }
+  }
+
+  public loadANewChart () {
     if (this.loading) { return }
     clickSound()
+    try { this.shadowRoot!.querySelector('#instructions')?.remove() } catch (e) {}
     this.loading = true;
     this.cryptowatchContainer.firstElementChild?.remove()
     const pair = this.getRandomPair()
     this.updateCryptowatch(pair)
+    this.currentPair = pair
   }
 
   private getRandomPair() {

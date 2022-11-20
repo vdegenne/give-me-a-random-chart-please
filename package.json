@@ -1,18 +1,22 @@
 {
+  "type": "module",
   "devDependencies": {
     "@material/mwc-button": "^0.20.0",
     "@material/mwc-circular-progress": "^0.20.0",
+    "@rollup/plugin-json": "^5.0.1",
     "@rollup/plugin-node-resolve": "^11.2.1",
     "@rollup/plugin-terser": "^0.1.0",
     "@rollup/plugin-typescript": "^8.2.1",
     "lit-element": "^2.4.0",
     "lit-html": "^1.3.0",
+    "node-fetch": "^3.3.0",
     "rollup": "^2.45.0",
     "tslib": "^2.2.0",
     "typescript": "^4.2.4"
   },
   "scripts": {
     "watch": "rollup -cw",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "browser-sync": "browser-sync . --files ./bundle.js --no-notify --no-open"
   }
 }
