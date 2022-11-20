@@ -103,11 +103,11 @@ export class GiveMeARandomChartPlease extends LitElement {
         ?disabled="${this.loading || this.pairs.length === 0}">random</mwc-button>
     </div> -->
     <div id="cryptowatch-wrapper">
-      <div id="pair">${this.choosen?.b}${this.choosen?.q}</div>
+      <div id="pair" @click=${(e)=>{this.loadANewChart()}}>${this.choosen?.b}${this.choosen?.q}</div>
       <mwc-circular-progress ?indeterminate="${this.loading}"></mwc-circular-progress>
       <div id="cryptowatch-container" style="display:flex;justify-content:center;align-items:center">
         <div id=instructions style="color:white">
-          <p>Press <b style="background:white;color:black;padding:0 4px">R</b> to load a new random graph</p>
+          <p>Press <b style="background:white;color:black;padding:0 4px" @click=${(e)=>{this.loadANewChart()}}>R</b> to load a new random graph</p>
           <p>Press <b style="background:white;color:black;padding:0 4px">E</b> to visit the coin (coinmarketcap) page</p>
           <p>(bonus: you can use a controller)</p>
         </div>
