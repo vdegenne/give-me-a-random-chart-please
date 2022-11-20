@@ -82,9 +82,9 @@ export class GiveMeARandomChartPlease extends LitElement {
   render () {
     return html`
     <div style="margin:12px;text-align:center">
-      <mwc-button unelevated icon="casino" style="--mdc-button-disabled-fill-color:grey;--mdc-button-disabled-ink-color:black"
+      <!-- <mwc-button unelevated icon="casino" style="--mdc-button-disabled-fill-color:grey;--mdc-button-disabled-ink-color:black"
         @click="${() => this.updateChart()}"
-        ?disabled="${this.loading || this.pairs.length === 0}">random</mwc-button>
+        ?disabled="${this.loading || this.pairs.length === 0}">random</mwc-button> -->
     </div>
     <div id="cryptowatch-wrapper">
       <div id="pair">${this.choosen?.b}${this.choosen?.q}</div>
